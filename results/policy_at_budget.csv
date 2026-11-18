@@ -1,0 +1,9 @@
+policy,budget_per_week,factor,detection_rate,false_alarms_per_week
+adaptive,1,1.100,0.367,0.805
+adaptive + 2 pts,1,0.700,0.233,0.875
+adaptive,2,1.000,0.467,1.925
+adaptive + 2 pts,2,0.600,0.333,1.295
+adaptive,4,1.000,0.467,1.925
+adaptive + 2 pts,4,0.600,0.333,1.295
+fixed (v0.1),4,2.000,0.467,3.781
+fixed + 2 pts,4,1.000,0.367,3.326
