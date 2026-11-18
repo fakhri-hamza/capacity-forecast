@@ -36,7 +36,7 @@ The detector scores how unusual each point is; the **alert policy** decides when
 | ≤ 2 | unreachable | unreachable | **47%** (1.9/wk) | 33% |
 | ≤ 4 | 47% (3.8/wk) | 37% | 47% (1.9/wk) | 33% |
 
-- **When you can only afford a few pages, the adaptive threshold wins clearly.** It catches 47% of incidents with 1.9 false alarms per week; the fixed rule needs 3.8 for the same 47% and can't get below 2.2 at any setting. A frozen threshold keeps paging when a metric's normal level drifts; a rolling one gets used to it.
+- **When you can only afford a few pages, the adaptive threshold wins clearly.** It catches 47% of incidents with 1.9 false alarms per week; the fixed rule needs 3.8 for the same 47% and never gets below 2.7 at any setting I tried (2.2 with the persistence filter). A frozen threshold keeps paging when a metric's normal level drifts; a rolling one gets used to it.
 - **When you want high recall, the fixed rule is better** (60% at 6.6/wk vs 8.7/wk for adaptive). The adaptive threshold also gets used to incidents that last long enough. No policy wins everywhere.
 - **Persistence filters hurt here.** Many labelled NAB incidents are short, so requiring 10 minutes of confirmation loses more incidents than false alarms. It's a common default in alerting tools, but on this data it is worse than nothing.
 - Caveat: 30 incident windows means each one is 3.3 points of detection rate. Treat small differences as noise.
