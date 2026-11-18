@@ -85,3 +85,34 @@ def evaluate(alarm: pd.Series, windows: list) -> dict:
     days = (t[-1] - start).total_seconds() / 86400
     return {"windows": len(windows), "detected": detected,
             "false_alarm_events": false_events, "days": days}
+
+
+# ---------------------------------------------------------------------- alert policies
+# The detectors above produce a score; a *policy* turns scores into pages. Two label-free ideas
+# to cut false alarms without touching the detector:
+#   adaptive threshold  "more unusual than 99.9% of the last 7 days" instead of a threshold frozen
+#                       after the first 15% (metrics drift: what was extreme in week 1 is normal later)
+#   persistence         only page when the condition holds for k consecutive points (10 min for k=2),
+#                       which filters one-sample blips
+
+
+def adaptive_alarms(score: pd.Series, factor: float = 1.0, q: float = 0.999,
+                    window: int = 7 * DAY) -> pd.Series:
+    """Alarm when the score exceeds factor x the q-quantile of the previous `window` points.
+
+    Until a full window is available the quantile uses all past points (at least the
+    probationary period). Same no-labels rule as `alarms`; `factor` only draws the trade-off.
+    """
+    n_train = int(len(score) * PROBATION)
+    past = score.replace([np.inf, -np.inf], np.nan).shift(1)
+    threshold = factor * past.rolling(window, min_periods=max(n_train, 1)).quantile(q)
+    out = (score > threshold).fillna(False)
+    out.iloc[:n_train] = False
+    return out
+
+
+def persistent(alarm: pd.Series, k: int = 2) -> pd.Series:
+    """Keep an alarm only once it has held for k consecutive points."""
+    if k <= 1:
+        return alarm
+    return alarm.astype(int).rolling(k, min_periods=k).sum().eq(k)

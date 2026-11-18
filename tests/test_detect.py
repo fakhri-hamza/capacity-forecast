@@ -39,3 +39,26 @@ def test_false_alarms_close_together_are_one_event():
 
 def test_mase_is_one_for_scale_error():
     assert mase(np.array([1.0, 1.0]), np.array([0.0, 0.0]), scale=1.0) == 1.0
+
+
+def test_persistent_drops_single_point_blips():
+    from capfc.detect import persistent
+    al = series(np.zeros(10)).astype(bool)
+    al.iloc[3] = True                              # 1-point blip
+    al.iloc[6:8] = True                            # held for 2 points
+    out = persistent(al, 2)
+    assert list(out[out].index) == [al.index[7]]   # fires once the 2nd point confirms
+
+
+def test_adaptive_threshold_follows_a_level_shift():
+    from capfc.detect import adaptive_alarms
+    rng = np.random.default_rng(1)
+    # noise scale doubles a third of the way in, then stays: a frozen threshold keeps firing,
+    # an adaptive one gets used to the new normal after a week of data
+    n = 288 * 20
+    v = rng.normal(0, 1, n)
+    v[n // 3:] *= 2
+    score = series(np.abs(v))
+    frozen = alarms(score).iloc[-288 * 5:].sum()
+    adaptive = adaptive_alarms(score).iloc[-288 * 5:].sum()
+    assert adaptive < frozen / 3
