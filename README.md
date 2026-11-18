@@ -1,5 +1,7 @@
 # Capacity Forecast
 
+[![ci](https://github.com/Zolnarb1/capacity-forecast/actions/workflows/ci.yml/badge.svg)](https://github.com/Zolnarb1/capacity-forecast/actions/workflows/ci.yml) ![Python 3.12](https://img.shields.io/badge/python-3.12-blue) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Detecting incidents and forecasting load on real cloud servers: what works, and at what cost in false alarms?**
 
 Data: the AWS CloudWatch part of the [Numenta Anomaly Benchmark](https://github.com/numenta/NAB): 17 real production metrics (EC2 CPU, disk writes, network in, load-balancer requests, RDS CPU), one point every 5 minutes, ~2 weeks each, **30 expert-labelled incident windows**.
@@ -77,3 +79,6 @@ tests/                 detection, probation period, alarm grouping, MASE, alert 
 
 ## Author
 Hamza Fakhri, Computer Science engineering student, Polytech Nantes.
+
+## License
+MIT, see [LICENSE](LICENSE). The public datasets used here keep their own licenses (sources linked above).
