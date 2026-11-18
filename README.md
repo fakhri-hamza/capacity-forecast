@@ -22,6 +22,25 @@ Three label-free detectors, one shared rule: **alarm when a score is higher than
 ![Example](results/example_series.png)
 *Example: an EC2 instance's CPU falls from ~93% to ~25% on 16 Apr (labelled incident). All three detectors fire inside the window; the z-score also pages on smaller dips elsewhere.*
 
+### 1b. Same detector, smarter alert policy
+The detector scores how unusual each point is; the **alert policy** decides when that becomes a page. Holding the best detector (seasonal) fixed, I compared four label-free policies (`python -m capfc.policies`):
+- **fixed:** the v0.1 rule, with a threshold frozen after the learning period;
+- **adaptive:** the score must beat the 99.9th percentile of the *previous 7 days*, so the threshold drifts with the metric;
+- **+ 2 pts:** each of the above with a persistence filter: the condition must hold for 2 consecutive points (10 min).
+
+![Policies](results/policy_tradeoff.png)
+
+| Alert budget (false pages per metric per week) | fixed (v0.1) | fixed + 2 pts | adaptive | adaptive + 2 pts |
+|---|---|---|---|---|
+| ≤ 1 | unreachable | unreachable | **37%** (0.8/wk) | 23% |
+| ≤ 2 | unreachable | unreachable | **47%** (1.9/wk) | 33% |
+| ≤ 4 | 47% (3.8/wk) | 37% | 47% (1.9/wk) | 33% |
+
+- **When you can only afford a few pages, the adaptive threshold wins clearly.** It catches 47% of incidents with 1.9 false alarms per week; the fixed rule needs 3.8 for the same 47% and can't get below 2.2 at any setting. A frozen threshold keeps paging when a metric's normal level drifts; a rolling one gets used to it.
+- **When you want high recall, the fixed rule is better** (60% at 6.6/wk vs 8.7/wk for adaptive). The adaptive threshold also gets used to incidents that last long enough. No policy wins everywhere.
+- **Persistence filters hurt here.** Many labelled NAB incidents are short, so requiring 10 minutes of confirmation loses more incidents than false alarms. It's a common default in alerting tools, but on this data it is worse than nothing.
+- Caveat: 30 incident windows means each one is 3.3 points of detection rate. Treat small differences as noise.
+
 ## 2. Day-ahead capacity forecasting: the flat line wins
 ![Forecast](results/forecast_mase.png)
 
@@ -42,6 +61,7 @@ python -m venv .venv && .venv\Scripts\activate
 pip install -r requirements.txt && pip install -e .
 python -m capfc.run      # downloads 17 series (~2 MB), prints both studies
 python -m capfc.plots
+python -m capfc.policies  # alert-policy comparison (1b)
 pytest
 ```
 
@@ -51,7 +71,8 @@ src/capfc/data.py      download NAB AWS series + labelled windows, regular 5-min
 src/capfc/detect.py    3 detectors, label-free threshold, event-level evaluation
 src/capfc/forecast.py  4 day-ahead models, MASE
 src/capfc/run.py       runs everything, writes results/*.csv
-tests/                 detection, probation period, alarm grouping, MASE
+src/capfc/policies.py  fixed vs adaptive threshold, persistence filter, alert budgets
+tests/                 detection, probation period, alarm grouping, MASE, alert policies
 ```
 
 ## Author

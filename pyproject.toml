@@ -1,6 +1,6 @@
 [project]
 name = "capfc"
-version = "0.1.0"
+version = "0.2.0"
 description = "Anomaly detection and day-ahead capacity forecasting on real AWS CloudWatch metrics (NAB)"
 requires-python = ">=3.10"
 
