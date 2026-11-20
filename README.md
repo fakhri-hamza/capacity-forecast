@@ -1,6 +1,6 @@
 # Capacity Forecast
 
-[![ci](https://github.com/Zolnarb1/capacity-forecast/actions/workflows/ci.yml/badge.svg)](https://github.com/Zolnarb1/capacity-forecast/actions/workflows/ci.yml) ![Python 3.12](https://img.shields.io/badge/python-3.12-blue) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![ci](https://github.com/fakhri-hamza/capacity-forecast/actions/workflows/ci.yml/badge.svg)](https://github.com/fakhri-hamza/capacity-forecast/actions/workflows/ci.yml) ![Python 3.12](https://img.shields.io/badge/python-3.12-blue) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **Detecting incidents and forecasting load on real cloud servers: what works, and at what cost in false alarms?**
 
